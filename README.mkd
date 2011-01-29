@@ -1,0 +1,7 @@
+
+README
+======
+
+Chrome extension to reveal bit.ly links. All bit.ly links will now show you the
+real link when you hover on them.
+
