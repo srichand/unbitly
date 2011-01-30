@@ -43,6 +43,13 @@
     color: #444;
 }
 
+#unbitly-body #options {
+    width: 500px;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+    color: #444;
+}
 /*
 a:link { color:#FF0000;}      
 a:visited {color:#00FF00;}

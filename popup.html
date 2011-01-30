@@ -4,20 +4,7 @@
 <script type="text/javascript" src="js/jquery.js"></script>          
 <link rel="stylesheet" type="text/css" href="css/reset-min.css">
 <link rel="stylesheet" type="text/css" href="css/default.css">
-<script type="text/javascript">
-function ClearStorage () {
-    var bkg = chrome.extension.getBackgroundPage()
-    bkg.ClearLocalStorage();
-    console.log("Cleared");
-}
 
-$.ready( function() {
-    $('a[id="clear-cache"]').click(function (event) {
-        alert("Clearing storage");
-        ClearStorage();
-    });
-});
-</script>
 </head>
 
 <body id="unbitly-body">
@@ -27,12 +14,26 @@ $.ready( function() {
 </header>
 
 <section id="page">
-<p>
+<p class="ClearCacheP">
     <ul>
-    <li><a href="#" id="clear-cache" onClick="ClearStorage()">Clear local cache</a></li>
+        <li><button id="ClearStorageButton" onClick="ClearStorage()">Clear local cache</button></li>
     </ul>
 </p>
 </section>
+
+<script type="text/javascript">
+function ClearStorage () {
+    var bkg = chrome.extension.getBackgroundPage();
+    bkg.ClearLocalStorage();
+    console.log("Cleared");
+    $("#ClearStorageButton").fadeOut("explode", function () {
+        $("p.ClearCacheP").html("Cache cleared. Thanks!");
+    });
+
+}
+
+</script>
+
 </body>
 </html>
 

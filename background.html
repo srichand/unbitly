@@ -5,35 +5,78 @@
 <script type="text/javascript">
 
 function ClearLocalStorage() {
-    localStorage.clear()
+    for (var i=0; i<localStorage.length; ++i) {
+        var key = localStorage.key(i);
+        if (key != "bitly-username" &&
+            key != "bitly-api_key" ) {
+                localStorage.removeItem(key);
+        }
+    }
 }
+
+function GetLocal (request) {
+    var response = Object();
+    response.in_cache = {};
+    response.not_in_cache = [];
+    response.errors = [];
+    $.each(request.big_list, function (index, key) {
+        try {
+            var value = localStorage.getItem(key);
+        } catch (error) {
+        }
+        if (value != null) {
+            response.in_cache[key] = value;
+        } else {
+            response.not_in_cache.push(key);
+        }
+    });
+    return response;
+}
+
+function StoreLocal (request) {
+    var response = Object();
+    $.each(request.map, function (short_url, long_url) {
+        localStorage.setItem(short_url, long_url);
+    });
+    return response;
+}
+
+function GetAuth (request) {
+    var response = Object();
+    response.username = "";
+    response.api_key = "";
+    try {
+        response.username = localStorage.getItem("bitly-username");
+        response.api_key = localStorage.getItem("bitly-api_key");
+    } catch (error) {
+        response.username = null;
+        response.api_key = null;
+    }
+    return response;
+}
+
+function SetAuth (request) {
+    localStorage.setItem("bitly-username", request.username);
+    localStorage.setItem("bitly-api_key", request.api_key);
+    console.log("Username set to: " + request.username);
+    console.log("API key set to: " + request.api_key);
+    var response = Object();
+    return response;
+}
+
 chrome.extension.onRequest.addListener (
     function(request, sender, sendResponse) {
         if (request.method == "GetLocal") {
-            var response = Object();
-            response.in_cache = {};
-            response.not_in_cache = [];
-            response.errors = [];
-            $.each(request.big_list, function (index, key) {
-                try {
-                    var value = localStorage.getItem(key);
-                } catch (error) {
-                }
-                if (value != null) {
-                    response.in_cache[key] = value;
-                } else {
-                    response.not_in_cache.push(key);
-                }
-            });
-            sendResponse(response);
-        }
-        
+            sendResponse(GetLocal(request));
+        }        
         if (request.method == "StoreLocal") {
-            var response = Object();
-            $.each(request.map, function (short_url, long_url) {
-                localStorage.setItem(short_url, long_url);
-            });
-            sendResponse(response);
+            sendResponse(StoreLocal(request));
+        }
+        if (request.method == "GetAuth") {
+            sendResponse(GetAuth(request));
+        }
+        if (request.method == "SetAuth") {
+            sendResponse(SetAuth(request));
         }
     }
 );

@@ -5,8 +5,11 @@
  * the LICENSE file for complete details.
  */
 
-var username = "srichand";
-var api_key = "R_d063f28e393d2db343ede07d0ecba220";
+//var username = "srichand";
+//var api_key = "R_d063f28e393d2db343ede07d0ecba220";
+
+var username = "";
+var api_key = "";
 
 function SetSel (short_url, long_url) {
     var sel = "a[href*=" + short_url + "]";
@@ -56,43 +59,75 @@ function CallBitly (big_list) {
     } // End while
 }
  
+/* 
+ * Call after authentication!
+ */
+function Unbitly() {
+     var big_map = {};
+     var big_list = [];
+     $('a[href*=bit.ly]').each( function() {
+         big_list.push($(this).attr("href")); 
+     });
+     
+     var request_obj = Object();
+     request_obj.big_list = big_list;
+     request_obj.method = "GetLocal";
+     
+     console.log("Calling background with: "  + request_obj.big_list);
+     
+     // Async message passing
+     chrome.extension.sendRequest(request_obj, 
+         function(response) {
+             console.log("Not in cache: " + response.not_in_cache);
+             /* First we deal with stuff not in our cache */
+             var not_in_cache = response.not_in_cache;                
+             CallBitly (not_in_cache);
+         
+             console.log("Stuff In cache: " + 
+                 JSON.stringify(response.in_cache));
+                 
+             /* Next, deal with stuff already in the cache */
+             var in_cache = response.in_cache;
+             $.each(response.in_cache, function (short_url, long_url) {
+                 console.log("In cache: " + short_url + " and " + long_url);
+                 SetSel(short_url, long_url);
+             });
+         
+     });
+}   
+
  
 /*
  * This caches all bit.ly links into a single array and then 
  * makes a single AJAX call to fetch the expanded URLs.
  */
-$().ready(
-    function() {
-        var big_map = {};
-        var big_list = [];
-        $('a[href*=bit.ly]').each( function() {
-            big_list.push($(this).attr("href")); 
-        });
-        
-        var request_obj = Object();
-        request_obj.big_list = big_list;
-        request_obj.method = "GetLocal";
-        
-        console.log("Calling background with: "  + request_obj.big_list);
-        
-        // Async message passing
-        chrome.extension.sendRequest(request_obj, 
-            function(response) {
-                console.log("Not in cache: " + response.not_in_cache);
-                /* First we deal with stuff not in our cache */
-                var not_in_cache = response.not_in_cache;                
-                CallBitly (not_in_cache);
-            
-                console.log("Stuff In cache: " + 
-                    JSON.stringify(response.in_cache));
-                    
-                /* Next, deal with stuff already in the cache */
-                var in_cache = response.in_cache;
-                $.each(response.in_cache, function (short_url, long_url) {
-                    console.log("In cache: " + short_url + " and " + long_url);
-                    SetSel(short_url, long_url);
-                });
-            
-        });
-    }   
-);
+$().ready(function () {
+    var request = Object();
+    request.method = "GetAuth";
+    chrome.extension.sendRequest(request, 
+        function (response) {
+            console.log("Received GetAuth response with: " + response.username
+                 + " and " + response.api_key);
+            //if (response.username != null && response.api_key == null) {
+                username = response.username;
+                api_key = response.api_key;
+                console.log("Unbitly with: " + username + " and " + api_key);
+                Unbitly();
+            //}
+        }
+    );
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
