@@ -1,0 +1,41 @@
+<!doctype html>
+<head>
+<link rel="stylesheet" type="text/css" href="css/reset-min.css">
+<link rel="stylesheet" type="text/css" href="css/default.css">
+    
+<script type="text/javascript" src="js/jquery.js"></script>          
+
+<script type="text/javascript">
+function SetOptions() {
+    var request = Object();
+    request.username = $("#username").val();
+    request.api_key = $("#api_key").val();
+    var bkg = chrome.extension.getBackgroundPage()
+    bkg.SetAuth(request);
+    console.log("Auth info set.");
+}
+
+</script>
+</head>
+
+<body id="unbitly-body">
+<header>
+<h1>Unbitly</h1>
+<h3>Options</h3>
+</header>
+
+<section id="options">
+<p id="desc">
+    You'll need to enter your bit.ly username and API key here.
+    You can get the API key from <a href="http://bit.ly/a/your_api_key" target="_blank">http://bit.ly/a/your_api_key</a>.
+</p>
+<p>
+    <ul>
+    <li>bit.ly Username: <input type="text" id="username" /></li>
+    <li>bit.ly API Key&nbsp;&nbsp;&nbsp; : <input type="text" id="api_key" /></li>
+    <li><button value = "Save" onClick="SetOptions()">Save</button></li>
+    </ul>
+</p>
+</section>
+</body>
+</html>
