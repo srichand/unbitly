@@ -1,6 +1,12 @@
 <!doctype html>
 <head>
+<script type="text/javascript" src="js/jquery.js"></script>          
+
 <script type="text/javascript">
+
+function ClearLocalStorage() {
+    localStorage.clear();
+}
 chrome.extension.onRequest.addListener (
     function(request, sender, sendResponse) {
         if (request.method == "GetLocal") {
@@ -11,9 +17,11 @@ chrome.extension.onRequest.addListener (
             $.each(request.big_list, function (index, key) {
                 try {
                     var value = localStorage.getItem(key);
-                    response.in_cache[key] = value;
                 } catch (error) {
-                    response.errors.push(error);
+                }
+                if (value != null) {
+                    response.in_cache[key] = value;
+                } else {
                     response.not_in_cache.push(key);
                 }
             });
@@ -22,9 +30,9 @@ chrome.extension.onRequest.addListener (
         
         if (request.method == "StoreLocal") {
             var response = Object();
-            $.each(request.map, function (short_url, long_url)) {
+            $.each(request.map, function (short_url, long_url) {
                 localStorage.setItem(short_url, long_url);
-            }
+            });
             sendResponse(response);
         }
     }

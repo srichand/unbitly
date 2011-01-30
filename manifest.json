@@ -9,7 +9,10 @@
                 "js/jquery.js",
                 "js/content.js"
             ],
-            "css": ["css/default.css"]
+            "css": [
+                "css/default.css",
+                "css/reset-min.css"
+            ]
         }
     ],
     "browser_action": {

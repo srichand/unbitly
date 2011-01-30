@@ -1,23 +1,64 @@
+<!doctype html>
+<html>
+<head>
 <script type="text/javascript" src="js/jquery.js"></script>          
-
-<style type="text/css">
-    body {
-      min-width:357px;
-      overflow-x:hidden;
-    }
-
-    img {
-      margin:5px;
-      border:2px solid black;
-      vertical-align:middle;
-      width:75px;
-      height:75px;
-    }
-</style>
-
-<script>
-    window.localStorage.clear();
+<link rel="stylesheet" type="text/css" href="css/reset-min.css">
+<link rel="stylesheet" type="text/css" href="css/default.css">
+<script type="text/javascript">
+function ClearStorage () {
+    var bkg = chrome.extension.getBackgroundPage()
+    bkg.ClearLocalStorage();
     console.log("Cleared");
-</script>
+}
 
-<p>This hopes that things have been cleared... </p>
+$.ready( function() {
+    $('a[id="clear-cache"]').click(function (event) {
+        alert("Clearing storage");
+        ClearStorage();
+    });
+});
+</script>
+</head>
+
+<body id="unbitly-body">
+<header>
+<h1>Unbitly</h1>
+<h3>Preferences</h3>
+</header>
+
+<section id="page">
+<p>
+    <ul>
+    <li><a href="#" id="clear-cache" onClick="ClearStorage()">Clear local cache</a></li>
+    </ul>
+</p>
+</section>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

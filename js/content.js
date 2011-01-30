@@ -40,7 +40,7 @@ function CallBitly (big_list) {
                     long_url = element.long_url;                 
                     if (long_url != undefined) {
                         map[short_url] = long_url;
-                        SetSel(key, value); 
+                        SetSel(short_url, long_url); 
                     }
                 });
                 var request_obj = Object();
@@ -69,34 +69,30 @@ $().ready(
             big_list.push($(this).attr("href")); 
         });
         
-        // Look up from cache first
-        $.each(big_list, function(index, key) {
-            value = GetLocal(key);
-            if (value != null) {
-                big_map [key] = value;
-                big_list.splice(index, 1); // Remove from biglist
-                SetSel(key, value);
-            }
-        });
         var request_obj = Object();
         request_obj.big_list = big_list;
         request_obj.method = "GetLocal";
         
+        console.log("Calling background with: "  + request_obj.big_list);
+        
         // Async message passing
-        $.each(big_list, function(index, key) {
-            chrome.extension.sendRequest(request_obj, 
+        chrome.extension.sendRequest(request_obj, 
             function(response) {
+                console.log("Not in cache: " + response.not_in_cache);
                 /* First we deal with stuff not in our cache */
                 var not_in_cache = response.not_in_cache;                
                 CallBitly (not_in_cache);
-                
+            
+                console.log("Stuff In cache: " + 
+                    JSON.stringify(response.in_cache));
+                    
                 /* Next, deal with stuff already in the cache */
                 var in_cache = response.in_cache;
-                $.each(in_cache, function (short_url, long_url) {
-                 SetSel(short_url, long_url);
+                $.each(response.in_cache, function (short_url, long_url) {
+                    console.log("In cache: " + short_url + " and " + long_url);
+                    SetSel(short_url, long_url);
                 });
-                
-            }
+            
         });
     }   
 );

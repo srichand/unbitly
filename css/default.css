@@ -5,3 +5,47 @@
 .unbitly-tooltip {
     border: 1px solid #333;
 }
+
+#unbitly-body {
+    min-width:357px;
+    overflow-x:hidden;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light",
+               "Helvetica Neue", sans-serif;
+    font-weight: 100;
+    margin: 2px;
+    padding: 20px;
+    -webkit-border-radius: 10px; /* all corners */
+    border:1px solid #fc0; /* border color, per usual */
+    text-decoration: none;
+}
+
+#unbitly-body header {
+    border-bottom: 1px solid #fc0;
+}
+
+#unbitly-body a:link {
+    text-decoration: none;
+    color: #555;
+}
+
+#unbitly-body h1 {
+    color: #333;
+    font-size: 2em;
+}
+
+#unbitly-body h3 {
+    color: #999;
+    font-size: 1em;
+}
+
+#unbitly-body #page {
+    padding-top: 2em;
+    color: #444;
+}
+
+/*
+a:link { color:#FF0000;}      
+a:visited {color:#00FF00;}
+a:hover {color:#FF00FF;}
+a:active {color:#0000FF;}
+*/
