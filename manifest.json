@@ -15,8 +15,11 @@
             ]
         }
     ],
+    "icons": {
+        "128": "images/1_128x128.png"
+    },
     "browser_action": {
-        "default_icon": "images/icon.png",
+        "default_icon": "images/1_128x128.png",
         "default_title": "Unbitly",
         "default_popup": "popup.html"
     },
