@@ -1,97 +1,102 @@
 /*
  * Content.js
  * Copyright (c) 2011 Srichand Pendyala <srichand.pendyala@gmail.com>
+ * Licensed for used under terms of the MIT X11 license. See 
+ * the LICENSE file for complete details.
  */
 
 var username = "srichand";
 var api_key = "R_d063f28e393d2db343ede07d0ecba220";
 
-/*
- * This makes a call for each bitly link on the page
- * which is pretty unoptimal.
- 
+function SetSel (short_url, long_url) {
+    var sel = "a[href*=" + short_url + "]";
+    $(sel).attr("title", long_url);
+}
 
-$().ready(
-    function() {
-        $('a[href*=bit.ly]').each(function() {
-            var element = this;
-            var link = $(this).attr("href");
-            console.log ("Link is" + link);
-            $.ajax({
-                type: "GET",
-                url: "http://api.bit.ly/v3/expand",
-                data: {shortUrl: link, apiKey: api_key, login:username},
-                dataType: "json",
-                success: function (v) {
-                    var new_link = v.data.expand[0].long_url;
-                    $(element).attr("title", new_link);
-                }
-            }); 
+function CallBitly (big_list) {
+    /*
+     * bit.ly's API allows a maximum of 15 URLs 
+     * to call expand. So we splice the big list
+     * into smaller lists 15 URLs at a time.
+     */
+    while (big_list.length > 0) {
+        var list = big_list.splice(0, 15);
+        var map = {};
+        var short_urls = "";        
+        $.each(list, function(index, v) {
+            short_urls += "&shortUrl=" + v; 
         });
-    }
-);
-*/
-
-
+        console.log("Making request for URLs: " + short_urls);
+        $.ajax ({
+            type: "GET",
+            url: "http://api.bit.ly/v3/expand",
+            data: short_urls + "&apiKey=" + api_key + "&login=" 
+            + username,
+            dataType: "json",
+            jsonp: "jsoncallback",
+            success: function (v) {
+                $.each(v.data.expand, function (index, element) {
+                    short_url = element.short_url;
+                    long_url = element.long_url;                 
+                    if (long_url != undefined) {
+                        map[short_url] = long_url;
+                        SetSel(key, value); 
+                    }
+                });
+                var request_obj = Object();
+                request_obj.map = map;
+                request_obj.method = "StoreLocal";
+                chrome.extension.sendRequest(request_obj,
+                    function (response) {
+                       console.log("Received response to StoreLocal");
+                    }
+                );
+            }
+        });        
+    } // End while
+}
+ 
+ 
 /*
  * This caches all bit.ly links into a single array and then 
  * makes a single AJAX call to fetch the expanded URLs.
  */
 $().ready(
     function() {
-        var map = {};
-        var list = [];
+        var big_map = {};
+        var big_list = [];
         $('a[href*=bit.ly]').each( function() {
-           list.push($(this).attr("href")); 
+            big_list.push($(this).attr("href")); 
         });
-        console.log("list is: " + list);
-        var short_urls = "";
         
-        $.each(list, function(index, v) {
-            console.log("List element: " + v);
-            short_urls += "&shortUrl=" + v; 
+        // Look up from cache first
+        $.each(big_list, function(index, key) {
+            value = GetLocal(key);
+            if (value != null) {
+                big_map [key] = value;
+                big_list.splice(index, 1); // Remove from biglist
+                SetSel(key, value);
+            }
         });
-        console.log("Looking at urls: " + short_urls);
-        $.ajax ({
-            type: "GET",
-            url: "http://api.bit.ly/v3/expand",
-            data: short_urls + "&apiKey=" + api_key + "&login=" + username,
-            dataType: "json",
-            jsonp: "jsoncallback",
-            success: function (v) {
-                console.log("Received: " + v.data.expand[0].long_url);
-                $.each(v.data.expand, function (index, element) {
-                    short_url = element.short_url;
-                    long_url = element.long_url;
-                    console.log("Short: " + short_url + " long: "
-                        + long_url);
-                    map[short_url] = long_url;
+        var request_obj = Object();
+        request_obj.big_list = big_list;
+        request_obj.method = "GetLocal";
+        
+        // Async message passing
+        $.each(big_list, function(index, key) {
+            chrome.extension.sendRequest(request_obj, 
+            function(response) {
+                /* First we deal with stuff not in our cache */
+                var not_in_cache = response.not_in_cache;                
+                CallBitly (not_in_cache);
+                
+                /* Next, deal with stuff already in the cache */
+                var in_cache = response.in_cache;
+                $.each(in_cache, function (short_url, long_url) {
+                 SetSel(short_url, long_url);
                 });
-                $.each(map, function(key, value){
-                    console.log("Expanding: " + key + " to value: " + value);
-                    var sel = "a[href*=" + key + "]";
-                    console.log("Selector: " + sel);
-                    $(sel).attr("title", value);
-                });
+                
             }
         });
     }   
 );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
