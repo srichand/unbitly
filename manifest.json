@@ -17,4 +17,8 @@
         "default_title": "Unbitly",
         "default_popup": "popup.html"
     },
+    "permissions": [
+            "http://*/*",
+            "https://*/*"
+    ]
 }
