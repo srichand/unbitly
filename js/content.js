@@ -10,7 +10,7 @@ var api_key = "";
 
 function SetSel (short_url, long_url) {
     var sel = "a[href*=" + short_url + "]";
-    console.log("Setting " + sel + " to " + long_url);
+    //console.log("Setting " + sel + " to " + long_url);
     $(sel).attr("title", long_url);
 }
 
