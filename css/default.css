@@ -50,6 +50,12 @@
     margin-bottom: 2em;
     color: #444;
 }
+
+section {
+    padding-top: 2em;
+    padding-bottom: 2em;
+}
+
 /*
 a:link { color:#FF0000;}      
 a:visited {color:#00FF00;}
