@@ -64,6 +64,36 @@ function SetAuth (request) {
     return response;
 }
 
+function ExpandLinks (request) {
+    var response = Object();
+    var auth = GetAuth(request);
+    $.ajax ({
+        type: "GET",
+        url: "http://api.bit.ly/v3/expand",
+        data: request.short_urls + "&apiKey=" + auth.api_key + "&login=" 
+            + auth.username,
+        dataType: "json",
+        jsonp: "jsoncallback",
+        success: function (v) {
+            var map = {};
+            $.each(v.data.expand, function (index, element) {
+                short_url = element.short_url;
+                long_url = element.long_url;                 
+                if (long_url != undefined) {
+                    map[short_url] = long_url;
+                    console.log("Received: " + long_url + 
+                        " for " + short_url);
+                }
+            });
+            response.map = map;
+            var request_obj = Object();
+            request_obj.map = map;
+            StoreLocal(request_obj);
+        }
+    });
+    return response;
+}
+
 chrome.extension.onRequest.addListener (
     function(request, sender, sendResponse) {
         if (request.method == "GetLocal") {
@@ -77,6 +107,9 @@ chrome.extension.onRequest.addListener (
         }
         if (request.method == "SetAuth") {
             sendResponse(SetAuth(request));
+        }
+        if (request.method == "ExpandLinks") {
+            sendResponse(ExpandLinks(request));
         }
     }
 );
