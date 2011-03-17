@@ -25,37 +25,24 @@ function CallBitly (big_list) {
     while (big_list.length > 0) {
         var list = big_list.splice(0, 15);
         var map = {};
-        var short_urls = "";        
+        var short_urls = "";
         $.each(list, function(index, v) {
-            short_urls += "&shortUrl=" + v; 
+            short_urls += "&shortUrl=" + v;
         });
         console.log("Making request for URLs: " + short_urls);
-        $.ajax ({
-            type: "GET",
-            url: "http://api.bit.ly/v3/expand",
-            data: short_urls + "&apiKey=" + api_key + "&login=" 
-            + username,
-            dataType: "json",
-            jsonp: "jsoncallback",
-            success: function (v) {
-                $.each(v.data.expand, function (index, element) {
-                    short_url = element.short_url;
-                    long_url = element.long_url;                 
-                    if (long_url != undefined) {
-                        map[short_url] = long_url;
-                        SetSel(short_url, long_url); 
-                    }
+        var request_obj = Object();
+        request_obj.method = "ExpandLinks";
+        request_obj.short_urls = short_urls;
+        chrome.extension.sendRequest(request_obj,
+            function (response) {
+                $.each(response.map, function (short_url, long_url) {
+                    console.log("Received final response: " + short_url
+                        + " for " + long_url);
+                    SetSel(short_url, long_url);        
                 });
-                var request_obj = Object();
-                request_obj.map = map;
-                request_obj.method = "StoreLocal";
-                chrome.extension.sendRequest(request_obj,
-                    function (response) {
-                       console.log("Received response to StoreLocal");
-                    }
-                );
             }
-        });        
+        );
+     
     } // End while
 }
  
