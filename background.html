@@ -4,6 +4,10 @@
 
 <script type="text/javascript">
 
+/*
+ * Clear the HTML5 Local Storage. Bitly username
+ * and the API key are preserved, however.
+ */
 function ClearLocalStorage() {
     for (var i=0; i<localStorage.length; ++i) {
         var key = localStorage.key(i);
@@ -14,6 +18,10 @@ function ClearLocalStorage() {
     }
 }
 
+/*
+ * Return full links for all bitly keys that are in cache.
+ * Anything that's not in the cache is returned as is.
+ */
 function GetLocal (request) {
     var response = Object();
     response.in_cache = {};
@@ -33,6 +41,9 @@ function GetLocal (request) {
     return response;
 }
 
+/*
+ * Set the expansions of bitly keys to their full URLs.
+ */
 function StoreLocal (request) {
     var response = Object();
     $.each(request.map, function (short_url, long_url) {
@@ -41,6 +52,9 @@ function StoreLocal (request) {
     return response;
 }
 
+/*
+ * Fetch bitly auth information from local storage, or return null.
+ */
 function GetAuth (request) {
     var response = Object();
     response.username = "";
@@ -55,15 +69,23 @@ function GetAuth (request) {
     return response;
 }
 
+/*
+ * Set bitly auth information into local storage.
+ */
 function SetAuth (request) {
     localStorage.setItem("bitly-username", request.username);
     localStorage.setItem("bitly-api_key", request.api_key);
-    console.log("Username set to: " + request.username);
-    console.log("API key set to: " + request.api_key);
+    //console.log("Username set to: " + request.username);
+    //console.log("API key set to: " + request.api_key);
     var response = Object();
     return response;
 }
 
+/*
+ * Expand all short bitly URLs in the request. This requires making
+ * an AJAX call to bitly. All fetched URLs are immediately cached
+ * into local storage.
+ */
 function ExpandLinks (request) {
     var response = Object();
     var auth = GetAuth(request);
@@ -81,8 +103,8 @@ function ExpandLinks (request) {
                 long_url = element.long_url;                 
                 if (long_url != undefined) {
                     map[short_url] = long_url;
-                    console.log("Received: " + long_url + 
-                        " for " + short_url);
+                    //console.log("Received: " + long_url + 
+                    //    " for " + short_url);
                 }
             });
             response.map = map;
@@ -94,6 +116,10 @@ function ExpandLinks (request) {
     return response;
 }
 
+/*
+ * Chrome extension messaging. Listeners for methods from
+ * the popup page and content.js
+ */
 chrome.extension.onRequest.addListener (
     function(request, sender, sendResponse) {
         if (request.method == "GetLocal") {
