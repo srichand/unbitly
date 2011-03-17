@@ -5,14 +5,12 @@
  * the LICENSE file for complete details.
  */
 
-//var username = "srichand";
-//var api_key = "R_d063f28e393d2db343ede07d0ecba220";
-
 var username = "";
 var api_key = "";
 
 function SetSel (short_url, long_url) {
     var sel = "a[href*=" + short_url + "]";
+    console.log("Setting " + sel + " to " + long_url);
     $(sel).attr("title", long_url);
 }
 
@@ -29,15 +27,15 @@ function CallBitly (big_list) {
         $.each(list, function(index, v) {
             short_urls += "&shortUrl=" + v;
         });
-        console.log("Making request for URLs: " + short_urls);
+        //console.log("Making request for URLs: " + short_urls);
         var request_obj = Object();
         request_obj.method = "ExpandLinks";
         request_obj.short_urls = short_urls;
         chrome.extension.sendRequest(request_obj,
             function (response) {
                 $.each(response.map, function (short_url, long_url) {
-                    console.log("Received final response: " + short_url
-                        + " for " + long_url);
+                    //console.log("Received final response: " + short_url
+                    //    + " for " + long_url);
                     SetSel(short_url, long_url);        
                 });
             }
@@ -65,18 +63,18 @@ function Unbitly() {
      // Async message passing
      chrome.extension.sendRequest(request_obj, 
          function(response) {
-             console.log("Not in cache: " + response.not_in_cache);
+             //console.log("Not in cache: " + response.not_in_cache);
              /* First we deal with stuff not in our cache */
              var not_in_cache = response.not_in_cache;                
              CallBitly (not_in_cache);
          
-             console.log("Stuff In cache: " + 
-                 JSON.stringify(response.in_cache));
+             //console.log("Stuff In cache: " + 
+             //    JSON.stringify(response.in_cache));
                  
              /* Next, deal with stuff already in the cache */
              var in_cache = response.in_cache;
              $.each(response.in_cache, function (short_url, long_url) {
-                 console.log("In cache: " + short_url + " and " + long_url);
+                 //console.log("In cache: " + short_url + " and " + long_url);
                  SetSel(short_url, long_url);
              });
          
@@ -93,14 +91,9 @@ $().ready(function () {
     request.method = "GetAuth";
     chrome.extension.sendRequest(request, 
         function (response) {
-            console.log("Received GetAuth response with: " + response.username
-                 + " and " + response.api_key);
-            //if (response.username != null && response.api_key == null) {
-                username = response.username;
-                api_key = response.api_key;
-                console.log("Unbitly with: " + username + " and " + api_key);
-                Unbitly();
-            //}
+            username = response.username;
+            api_key = response.api_key;
+            Unbitly();
         }
     );
 });
