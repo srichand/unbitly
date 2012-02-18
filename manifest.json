@@ -27,6 +27,7 @@
     "background_page": "background.html",
     "permissions": [
             "http://*/*",
-            "https://*/*"
+            "https://*/*",
+			"debugger"
     ]
 }
