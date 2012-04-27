@@ -1,7 +1,11 @@
 
-README
-======
-
+# README
 Chrome extension to reveal bit.ly links. All bit.ly links will now show you the
 real link when you hover on them.
+
+## Installation
+You will need a bit.ly API key to use this extension.
+
+Clone this repository into a directory of your choice. Then follow the instructions at
+http://code.google.com/chrome/extensions/packaging.html
 
